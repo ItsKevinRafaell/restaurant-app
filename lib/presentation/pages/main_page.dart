@@ -11,8 +11,8 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Consumer<IndexNavProvider>(
-        builder: (context, value, child) {
-          return switch (value.indexBottomNavBar) {
+        builder: (_, provider, __) {
+          return switch (provider.indexBottomNavBar) {
             1 => const SearchPage(),
             _ => const HomePage(),
           };

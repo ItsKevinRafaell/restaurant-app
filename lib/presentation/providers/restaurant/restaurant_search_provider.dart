@@ -1,10 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:restaurant_app/data/api_services.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_search_result_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/static/restaurant_exception.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/static/restaurant_search_result_state.dart';
 
 class RestaurantSearchProvider extends ChangeNotifier {
   final ApiServices _apiServices;
-  final TextEditingController searchController = TextEditingController();
+  final searchController = TextEditingController();
 
   RestaurantSearchProvider(this._apiServices);
 
@@ -17,16 +18,18 @@ class RestaurantSearchProvider extends ChangeNotifier {
       _resultState = RestaurantSearchLoadingState();
       notifyListeners();
 
+      await Future.delayed(const Duration(seconds: 2));
       final results = await _apiServices.searchRestaurants(query);
 
-      if (results == true) {
-        _resultState = RestaurantSearchLoadedState([]);
+      if (results.error == true) {
+        throw RestaurantException('Terjadi kesalahan saat mencari restoran.');
       } else {
         _resultState = RestaurantSearchLoadedState(results.restaurants!);
       }
-    } catch (e) {
-      _resultState =
-          RestaurantSearchErrorState('Gagal memuat hasil pencarian: $e');
+    } on RestaurantException catch (e) {
+      _resultState = RestaurantSearchErrorState(e.message);
+    } on Exception catch (e) {
+      _resultState = RestaurantSearchErrorState(getUserFriendlyErrorMessage(e));
     } finally {
       notifyListeners();
     }

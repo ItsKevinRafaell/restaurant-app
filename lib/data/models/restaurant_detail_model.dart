@@ -16,14 +16,15 @@ class RestaurantDetailModel {
 
   String toJson() => json.encode(toMap());
 
-  factory RestaurantDetailModel.fromMap(Map<String, dynamic> json) =>
-      RestaurantDetailModel(
-        error: json["error"],
-        message: json["message"],
-        restaurant: json["restaurant"] == null
-            ? null
-            : RestaurantModel.fromMap(json["restaurant"]),
-      );
+  factory RestaurantDetailModel.fromMap(Map<String, dynamic> json) {
+    return RestaurantDetailModel(
+      error: json["error"],
+      message: json["message"],
+      restaurant: json["restaurant"] == null
+          ? null
+          : RestaurantModel.fromMap(json["restaurant"]),
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         "error": error,
@@ -40,7 +41,7 @@ class RestaurantModel {
   final String? address;
   final String? pictureId;
   final List<Category>? categories;
-  final Menus? menus;
+  final Menu? menus;
   final double? rating;
   final List<CustomerReview>? customerReviews;
 
@@ -73,7 +74,7 @@ class RestaurantModel {
             ? []
             : List<Category>.from(
                 json["categories"]!.map((x) => Category.fromMap(x))),
-        menus: json["menus"] == null ? null : Menus.fromMap(json["menus"]),
+        menus: json["menus"] == null ? null : Menu.fromMap(json["menus"]),
         rating: json["rating"]?.toDouble(),
         customerReviews: json["customerReviews"] == null
             ? []
@@ -148,20 +149,20 @@ class CustomerReview {
       };
 }
 
-class Menus {
+class Menu {
   final List<Category>? foods;
   final List<Category>? drinks;
 
-  Menus({
+  Menu({
     this.foods,
     this.drinks,
   });
 
-  factory Menus.fromJson(String str) => Menus.fromMap(json.decode(str));
+  factory Menu.fromJson(String str) => Menu.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory Menus.fromMap(Map<String, dynamic> json) => Menus(
+  factory Menu.fromMap(Map<String, dynamic> json) => Menu(
         foods: json["foods"] == null
             ? []
             : List<Category>.from(

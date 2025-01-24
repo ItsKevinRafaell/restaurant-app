@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/restaurant_detail_provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_detail_result_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/static/restaurant_detail_result_state.dart';
+import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
 import 'package:restaurant_app/presentation/widgets/menu_item_card.dart';
 
 class DetailPage extends StatefulWidget {
   final String restaurantId;
 
-  const DetailPage({Key? key, required this.restaurantId}) : super(key: key);
+  const DetailPage({super.key, required this.restaurantId});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
-  bool isDescriptionExpanded = false;
-
   @override
   void initState() {
     super.initState();
@@ -30,39 +29,52 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Restaurant Detail'),
+        title: Text('Restaurant Detail', style: AppTextStyles.titleLarge),
         elevation: 0,
       ),
       body: Consumer<RestaurantDetailProvider>(
         builder: (context, provider, child) {
           return switch (provider.resultState) {
-            RestaurantDetailLoadingState =>
-              const Center(child: CircularProgressIndicator()),
+            RestaurantDetailLoadingState _ => Column(
+                children: [
+                  Hero(
+                    tag: provider.imageUrl!,
+                    child: Image.network(
+                      provider.imageUrl!,
+                      width: double.infinity,
+                      height: 250,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const CircularProgressIndicator(),
+                ],
+              ),
             RestaurantDetailLoadedState(data: var restaurant) =>
               CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        'https://restaurant-api.dicoding.dev/images/large/${restaurant.restaurant!.pictureId}',
-                        width: double.infinity,
-                        height: 250,
-                        fit: BoxFit.cover,
+                      child: Hero(
+                        tag: restaurant.restaurant!.pictureId!,
+                        child: Image.network(
+                          'https://restaurant-api.dicoding.dev/images/large/${restaurant.restaurant!.pictureId}',
+                          width: double.infinity,
+                          height: 250,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
                   const SliverPadding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0)),
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                  ),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         restaurant.restaurant!.name!,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.headlineLarge,
                       ),
                     ),
                   ),
@@ -76,16 +88,52 @@ class _DetailPageState extends State<DetailPage> {
                           const SizedBox(width: 4),
                           Text(
                             restaurant.restaurant!.city!,
-                            style: const TextStyle(color: Colors.grey),
+                            style: AppTextStyles.bodyMedium
+                                .copyWith(color: Colors.grey),
                           ),
                           const SizedBox(width: 16),
                           const Icon(Icons.star, size: 18, color: Colors.amber),
                           const SizedBox(width: 4),
                           Text(
                             "${restaurant.restaurant!.rating}",
-                            style: const TextStyle(color: Colors.grey),
+                            style: AppTextStyles.bodyMedium
+                                .copyWith(color: Colors.grey),
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_city,
+                              size: 18, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          Text(
+                            restaurant.restaurant!.address!,
+                            style: AppTextStyles.bodyMedium
+                                .copyWith(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Wrap(
+                        spacing: 8,
+                        children: restaurant.restaurant!.categories!
+                            .map((category) => Chip(
+                                  label: Text(
+                                    category.name!,
+                                    style: AppTextStyles.bodyMedium,
+                                  ),
+                                  backgroundColor: Colors.blue.withOpacity(0.1),
+                                ))
+                            .toList(),
                       ),
                     ),
                   ),
@@ -97,35 +145,36 @@ class _DetailPageState extends State<DetailPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            restaurant.restaurant!.description!,
-                            maxLines: isDescriptionExpanded ? null : 3,
-                            overflow: isDescriptionExpanded
-                                ? TextOverflow.visible
-                                : TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              height: 1.5,
-                              color: Colors.grey,
-                            ),
+                          Consumer<RestaurantDetailProvider>(
+                            builder: (context, provider, child) {
+                              return Text(
+                                restaurant.restaurant!.description!,
+                                maxLines:
+                                    provider.isDescriptionExpanded ? null : 3,
+                                overflow: provider.isDescriptionExpanded
+                                    ? TextOverflow.visible
+                                    : TextOverflow.ellipsis,
+                                style: AppTextStyles.bodyLarge
+                                    .copyWith(color: Colors.grey),
+                              );
+                            },
                           ),
-                          if (restaurant.restaurant!.description!.length >
-                              100) // Hanya tampilkan tombol jika deskripsi panjang
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  isDescriptionExpanded =
-                                      !isDescriptionExpanded; // Toggle state
-                                });
+                          if (restaurant.restaurant!.description!.length > 100)
+                            Consumer<RestaurantDetailProvider>(
+                              builder: (context, provider, child) {
+                                return TextButton(
+                                  onPressed: () {
+                                    provider.toggleDescriptionExpanded();
+                                  },
+                                  child: Text(
+                                    provider.isDescriptionExpanded
+                                        ? 'Sembunyikan'
+                                        : 'Selengkapnya',
+                                    style: AppTextStyles.labelLarge
+                                        .copyWith(color: Colors.blue),
+                                  ),
+                                );
                               },
-                              child: Text(
-                                isDescriptionExpanded
-                                    ? 'Sembunyikan'
-                                    : 'Selengkapnya', // Tentukan teks tombol
-                                style: const TextStyle(
-                                  color: Colors.blue, // Warna teks tombol
-                                ),
-                              ),
                             ),
                         ],
                       ),
@@ -136,13 +185,10 @@ class _DetailPageState extends State<DetailPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
                               "Ulasan Pelanggan",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: AppTextStyles.titleLarge,
                             ),
                           ),
                           IconButton(
@@ -151,7 +197,11 @@ class _DetailPageState extends State<DetailPage> {
                                 context,
                                 '/review',
                                 arguments: widget.restaurantId,
-                              );
+                              ).then((_) {
+                                context
+                                    .read<RestaurantDetailProvider>()
+                                    .fetchRestaurantDetail(widget.restaurantId);
+                              });
                             },
                             icon: const Icon(Icons.add),
                           ),
@@ -165,16 +215,16 @@ class _DetailPageState extends State<DetailPage> {
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     sliver: SliverToBoxAdapter(
                       child: SizedBox(
-                        height: 150, // Tinggi container untuk grid horizontal
+                        height: 150,
                         child: GridView.builder(
-                          scrollDirection: Axis.horizontal, // Scroll horizontal
+                          scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 1, // Satu baris
-                            mainAxisSpacing: 16, // Spasi antar item
-                            crossAxisSpacing: 16, // Spasi antar item
-                            childAspectRatio: 1, // Rasio lebar/tinggi item
+                            crossAxisCount: 1,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                            childAspectRatio: 1,
                           ),
                           itemCount:
                               restaurant.restaurant!.customerReviews!.length,
@@ -195,10 +245,7 @@ class _DetailPageState extends State<DetailPage> {
                                       review.name!,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      style: AppTextStyles.titleMedium,
                                     ),
                                     const SizedBox(height: 8),
                                     Expanded(
@@ -206,19 +253,15 @@ class _DetailPageState extends State<DetailPage> {
                                         review.review!,
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
+                                        style: AppTextStyles.bodyMedium
+                                            .copyWith(color: Colors.grey),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       review.date!,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
+                                      style: AppTextStyles.labelSmall
+                                          .copyWith(color: Colors.grey),
                                     ),
                                   ],
                                 ),
@@ -231,15 +274,12 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   const SliverPadding(
                       padding: EdgeInsets.symmetric(vertical: 16.0)),
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         "Menu Makanan",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.titleLarge,
                       ),
                     ),
                   ),
@@ -251,7 +291,7 @@ class _DetailPageState extends State<DetailPage> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 1.4,
+                      childAspectRatio: 1.1,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -260,7 +300,7 @@ class _DetailPageState extends State<DetailPage> {
                         return MenuItemCard(
                           itemName: food.name!,
                           imageUrl:
-                              'https://restaurant-api.dicoding.dev/images/large/${restaurant.restaurant!.pictureId}',
+                              'https://media02.stockfood.com/largepreviews/NDI0NTM5NzYx/13694831-Puff-pastry-salmon-snails-on-a-spinach-salad-for-Christmas.jpg',
                         );
                       },
                       childCount: restaurant.restaurant!.menus!.foods!.length,
@@ -268,15 +308,12 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   const SliverPadding(
                       padding: EdgeInsets.symmetric(vertical: 16.0)),
-                  const SliverToBoxAdapter(
+                  SliverToBoxAdapter(
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         "Menu Minuman",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: AppTextStyles.titleLarge,
                       ),
                     ),
                   ),
@@ -288,7 +325,7 @@ class _DetailPageState extends State<DetailPage> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: 1.4,
+                      childAspectRatio: 1.2,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -297,7 +334,7 @@ class _DetailPageState extends State<DetailPage> {
                         return MenuItemCard(
                           itemName: drink.name!,
                           imageUrl:
-                              'https://restaurant-api.dicoding.dev/images/large/${restaurant.restaurant!.pictureId}',
+                              'https://media02.stockfood.com/largepreviews/NDIyNzMwOTEx/13636481-Melon-mojito-horchata-sweet-cinnamon-milk-drink-for-the-Tex-Mex-party.jpg',
                         );
                       },
                       childCount: restaurant.restaurant!.menus!.drinks!.length,
@@ -311,27 +348,21 @@ class _DetailPageState extends State<DetailPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Gambar atau ikon error
-                    Icon(
+                    const Icon(
                       Icons.error_outline,
                       size: 64,
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    // Pesan error
                     Text(
                       "Gagal memuat data: $error",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.red,
-                      ),
+                      style:
+                          AppTextStyles.bodyLarge.copyWith(color: Colors.red),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
-                    // Tombol untuk mencoba lagi
                     ElevatedButton(
                       onPressed: () {
-                        // Memuat ulang data
                         context
                             .read<RestaurantDetailProvider>()
                             .fetchRestaurantDetail(widget.restaurantId);

@@ -25,8 +25,7 @@ void main() {
         ChangeNotifierProvider(
             create: (context) => RestaurantDetailProvider(ApiServices())),
         ChangeNotifierProvider(
-          create: (context) =>
-              RestaurantSearchProvider(ApiServices()), // Tambahkan provider ini
+          create: (context) => RestaurantSearchProvider(ApiServices()),
         ),
         ChangeNotifierProvider(
           create: (context) => RestaurantReviewProvider(ApiServices()),
@@ -38,7 +37,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/data/models/restaurant_list_model.dart';
+import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
 
 class RestaurantCard extends StatelessWidget {
-  final Restaurant restaurant; // Tambahkan parameter deskripsi
+  final Restaurant restaurant;
   final Function() onTap;
 
   const RestaurantCard({
-    Key? key,
+    super.key,
     required this.onTap,
     required this.restaurant,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,19 +25,19 @@ class RestaurantCard extends StatelessWidget {
         child: ListTile(
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              'https://restaurant-api.dicoding.dev/images/small/${restaurant.pictureId}',
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
+            child: Hero(
+              tag: restaurant.pictureId!,
+              child: Image.network(
+                'https://restaurant-api.dicoding.dev/images/small/${restaurant.pictureId}',
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           title: Text(
-            restaurant.name!, // Tampilkan nama restoran
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            restaurant.name!,
+            style: AppTextStyles.titleLarge,
           ),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,18 +48,18 @@ class RestaurantCard extends StatelessWidget {
                   const Icon(Icons.location_on, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
-                    restaurant.city!, // Tampilkan kota
-                    style: const TextStyle(color: Colors.grey),
+                    restaurant.city!,
+                    style:
+                        AppTextStyles.bodyMedium.copyWith(color: Colors.grey),
                   ),
                 ],
               ),
               const SizedBox(height: 4),
               Text(
-                restaurant.description!, // Tampilkan deskripsi
-                maxLines: 1, // Batasi hanya satu baris
-                overflow: TextOverflow
-                    .ellipsis, // Tambahkan ellipsis jika teks terlalu panjang
-                style: const TextStyle(color: Colors.grey),
+                restaurant.description!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey),
               ),
               const SizedBox(height: 4),
               Row(
@@ -66,8 +67,9 @@ class RestaurantCard extends StatelessWidget {
                   const Icon(Icons.star, size: 16, color: Colors.amber),
                   const SizedBox(width: 4),
                   Text(
-                    "${restaurant.rating}", // Tampilkan rating
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    "${restaurant.rating}",
+                    style: AppTextStyles.bodyMedium
+                        .copyWith(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
