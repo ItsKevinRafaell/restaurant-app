@@ -36,9 +36,7 @@ void main() async {
   await localNotificationService.requestPermissions();
 
   // Initialize Workmanager at app startup
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
-  final workmanagerService = WorkmanagerService();
-  await workmanagerService.runPeriodicTask();
+  await WorkmanagerService.initializeWorkmanager();
   debugPrint('Main: Workmanager initialized and scheduled for 11 AM');
 
   final notificationAppLaunchDetails =
