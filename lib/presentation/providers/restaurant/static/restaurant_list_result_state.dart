@@ -1,19 +1,17 @@
-import 'package:restaurant_app/data/models/restaurant_list_model.dart';
+abstract class RestaurantListState {}
 
-sealed class RestaurantListResultState {}
+class RestaurantListNoneState extends RestaurantListState {}
 
-class RestaurantListNoneState extends RestaurantListResultState {}
+class RestaurantListLoadingState extends RestaurantListState {}
 
-class RestaurantListLoadingState extends RestaurantListResultState {}
+class RestaurantListLoadedState extends RestaurantListState {
+  final dynamic result;
 
-class RestaurantListErrorState extends RestaurantListResultState {
-  final String error;
-
-  RestaurantListErrorState(this.error);
+  RestaurantListLoadedState(this.result);
 }
 
-class RestaurantListLoadedState extends RestaurantListResultState {
-  final List<Restaurant> data;
+class RestaurantListErrorState extends RestaurantListState {
+  final String message;
 
-  RestaurantListLoadedState(this.data);
+  RestaurantListErrorState(this.message);
 }

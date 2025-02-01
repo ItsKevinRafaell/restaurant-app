@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_detail_provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_list_provider.dart';
+import 'package:restaurant_app/domain/entities/restaurant_list_model.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_detail_provider.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_list_provider.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/local_database_provider.dart';
 import 'package:restaurant_app/presentation/routes/navigation_route.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/static/restaurant_list_result_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_list_state.dart';
 import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
 import 'package:restaurant_app/presentation/widgets/restaurant_card.dart';
 
@@ -19,13 +21,16 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    Future.microtask(() {
-      context.read<RestaurantListProvider>().fetchRestaurants();
+    Future.microtask(() async {
+      // Muat data restoran dan favorit
+      await context.read<RestaurantListProvider>().fetchRestaurants();
+      await context.read<LocalDatabaseProvider>().loadAllRestaurants();
     });
   }
 
   Future<void> _refreshData() async {
     await context.read<RestaurantListProvider>().fetchRestaurants();
+    await context.read<LocalDatabaseProvider>().loadAllRestaurants();
   }
 
   @override
@@ -35,12 +40,12 @@ class _HomePageState extends State<HomePage> {
         title: Text('Restaurant App', style: AppTextStyles.titleLarge),
         elevation: 0,
       ),
-      body: Consumer<RestaurantListProvider>(
-        builder: (context, provider, child) {
-          return switch (provider.resultState) {
+      body: Consumer2<RestaurantListProvider, LocalDatabaseProvider>(
+        builder: (context, restaurantProvider, localDbProvider, child) {
+          return switch (restaurantProvider.resultState) {
             RestaurantListLoadingState _ =>
               const Center(child: CircularProgressIndicator()),
-            RestaurantListErrorState(error: var error) => Center(
+            RestaurantListErrorState(message: var error) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -68,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-            RestaurantListLoadedState(data: var restaurants) =>
+            RestaurantListLoadedState(data: List<Restaurant> restaurants) =>
               RefreshIndicator(
                 onRefresh: _refreshData,
                 child: SingleChildScrollView(
@@ -93,18 +98,32 @@ class _HomePageState extends State<HomePage> {
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: restaurants.length,
                           itemBuilder: (context, index) {
-                            final restaurant = restaurants[index];
+                            final Restaurant restaurant = restaurants[index];
+                            final isFavorite = localDbProvider.restaurantList
+                                    ?.any((fav) => fav.id == restaurant.id) ??
+                                false;
+
                             return RestaurantCard(
                               restaurant: restaurant,
+                              showFavoriteIcon: true, // Tampilkan ikon favorit
+                              showDeleteIcon: false,
+                              isFavorite: isFavorite, // Teruskan status favorit
                               onTap: () {
-                                context
-                                    .read<RestaurantDetailProvider>()
-                                    .setRestaurantImage(
-                                      'https://restaurant-api.dicoding.dev/images/small/${restaurant.pictureId}',
-                                    );
                                 Navigator.pushNamed(
-                                    context, NavigationRoute.detailRoute.name,
-                                    arguments: restaurant.id);
+                                  context,
+                                  NavigationRoute.detailRoute.name,
+                                  arguments: restaurant.id,
+                                ).then((_) {
+                                  // Reload data when returning to Home page
+                                  localDbProvider.loadAllRestaurants();
+                                });
+                              },
+                              onDelete: () {
+                                // Handle aksi hapus dari favorit
+                                if (restaurant.id != null) {
+                                  localDbProvider
+                                      .removeRestaurant(restaurant.id!);
+                                }
                               },
                             );
                           },

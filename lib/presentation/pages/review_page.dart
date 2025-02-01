@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_review_provider.dart';
 import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_review_provider.dart';
 
 class ReviewPage extends StatefulWidget {
   final String restaurantId;

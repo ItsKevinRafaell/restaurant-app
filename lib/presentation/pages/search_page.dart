@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_detail_provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/restaurant_search_provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/static/restaurant_search_result_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/local_database_provider.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_search_provider.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_search_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_detail_provider.dart';
+import 'package:restaurant_app/presentation/routes/navigation_route.dart';
 import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
 import 'package:restaurant_app/presentation/widgets/restaurant_card.dart';
 
@@ -29,21 +31,26 @@ class SearchPage extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               "Mari temukan restoran favoritmu!",
-              style: AppTextStyles.bodyMedium.copyWith(color: Colors.grey),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: Colors.grey),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: searchProvider.searchController,
               decoration: InputDecoration(
                 hintText: 'Cari restoran...',
-                hintStyle:
-                    AppTextStyles.bodyMedium.copyWith(color: Colors.grey),
+                hintStyle: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: Colors.grey),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
                     final query = searchProvider.searchController.text.trim();
                     if (query.isNotEmpty) {
-                      searchProvider.searchRestaurants(query);
+                      searchProvider.searchRestaurantsByQuery(query);
                     }
                   },
                 ),
@@ -51,10 +58,10 @@ class SearchPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              style: AppTextStyles.bodyMedium,
+              style: Theme.of(context).textTheme.bodyMedium,
               onSubmitted: (query) {
-                if (query.isNotEmpty) {
-                  searchProvider.searchRestaurants(query);
+                if (query.trim().isNotEmpty) {
+                  searchProvider.searchRestaurantsByQuery(query.trim());
                 }
               },
             ),
@@ -63,50 +70,68 @@ class SearchPage extends StatelessWidget {
               child: Consumer<RestaurantSearchProvider>(
                 builder: (context, provider, child) {
                   return switch (provider.resultState) {
-                    RestaurantSearchNoneState() => Center(
+                    RestaurantSearchInitialState() => Center(
                         child: Text(
                           'Masukkan kata kunci untuk mencari restoran.',
-                          style: AppTextStyles.bodyMedium
-                              .copyWith(color: Colors.grey),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.grey),
                         ),
                       ),
-                    RestaurantSearchLoadingState _ =>
+                    RestaurantSearchLoadingState() =>
                       const Center(child: CircularProgressIndicator()),
-                    RestaurantSearchLoadedState(restaurants: var restaurants) =>
+                    RestaurantSearchLoadedState(data: var restaurants) =>
                       restaurants.isEmpty
                           ? Center(
                               child: Text(
                                 'Tidak ada restoran yang ditemukan.',
-                                style: AppTextStyles.bodyMedium
-                                    .copyWith(color: Colors.grey),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(color: Colors.grey),
                               ),
                             )
                           : ListView.builder(
                               itemCount: restaurants.length,
                               itemBuilder: (context, index) {
                                 final restaurant = restaurants[index];
-                                return RestaurantCard(
-                                  restaurant: restaurant,
-                                  onTap: () {
-                                    context
-                                        .read<RestaurantDetailProvider>()
-                                        .setRestaurantImage(
-                                          'https://restaurant-api.dicoding.dev/images/small/${restaurant.pictureId}',
+                                final detailProvider =
+                                    context.watch<RestaurantDetailProvider>();
+
+                                final localDbProvider =
+                                    context.watch<LocalDatabaseProvider>();
+
+                                return FutureBuilder<bool>(
+                                  future: localDbProvider
+                                      .isRestaurantExist(restaurant.id ?? ''),
+                                  builder: (context, snapshot) {
+                                    final isFavorite = snapshot.data ?? false;
+
+                                    return RestaurantCard(
+                                      restaurant: restaurant,
+                                      isFavorite: isFavorite,
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                          context,
+                                          NavigationRoute.detailRoute.name,
+                                          arguments: restaurant.id,
                                         );
-                                    Navigator.pushNamed(
-                                      context,
-                                      '/detail',
-                                      arguments: restaurant.id,
+                                      },
+                                      showFavoriteIcon: true,
+                                      onFavoriteToggle: null,
                                     );
                                   },
                                 );
                               },
                             ),
-                    RestaurantSearchErrorState(error: var error) => Center(
+                    RestaurantSearchErrorState(message: var error) => Center(
                         child: Text(
                           error,
-                          style: AppTextStyles.bodyMedium
-                              .copyWith(color: Colors.red),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(color: Colors.red),
                         ),
                       ),
                     _ => const SizedBox(),
