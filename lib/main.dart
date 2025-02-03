@@ -21,7 +21,7 @@ import 'package:restaurant_app/presentation/providers/restaurant/providers/resta
 import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_review_provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/favorite_provider.dart';
 import 'package:restaurant_app/presentation/routes/navigation_route.dart';
-import 'package:restaurant_app/presentation/themes/theme_provider.dart';
+import 'package:restaurant_app/presentation/themes/providers/theme_provider.dart';
 import 'package:workmanager/workmanager.dart';
 import 'presentation/themes/app_theme.dart';
 
@@ -35,7 +35,6 @@ void main() async {
   await localNotificationService.configureLocalTimeZone();
   await localNotificationService.requestPermissions();
 
-  // Initialize Workmanager at app startup
   await WorkmanagerService.initializeWorkmanager();
   debugPrint('Main: Workmanager initialized and scheduled for 11 AM');
 
@@ -49,7 +48,7 @@ void main() async {
     payload = notificationResponse?.payload;
     if (payload != null && payload.isNotEmpty) {
       debugPrint('Main: App launched from notification with payload: $payload');
-      // Delay navigation to ensure app is fully initialized
+
       Future.delayed(const Duration(milliseconds: 100), () {
         navigatorKey.currentState?.pushNamed(
           NavigationRoute.detailRoute.name,
@@ -59,7 +58,6 @@ void main() async {
     }
   }
 
-  // Listen for notification selection
   selectNotificationStream.stream.listen((String? payload) {
     if (payload != null && payload.isNotEmpty) {
       debugPrint('Main: Notification selected with payload: $payload');
@@ -101,7 +99,8 @@ void main() async {
             localDatabaseProvider: context.read<LocalDatabaseProvider>(),
           ),
           update: (context, localDatabaseProvider, previousFavoriteProvider) =>
-              previousFavoriteProvider ?? FavoriteProvider(
+              previousFavoriteProvider ??
+              FavoriteProvider(
                 localDatabaseProvider: localDatabaseProvider,
               ),
         ),

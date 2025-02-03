@@ -116,7 +116,7 @@ class DetailRestaurant {
 
   factory DetailRestaurant.fromMapSqlite(Map<String, dynamic> map) {
     return DetailRestaurant(
-      id: map['id_restaurant'] as String?, // Pastikan tipe data sesuai
+      id: map['id_restaurant'] as String?,
       name: map['name'] as String?,
       description: map['description'] as String?,
       address: map['address'] as String?,

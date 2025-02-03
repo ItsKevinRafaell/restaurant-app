@@ -214,11 +214,8 @@ class LocalNotificationService {
       now.year,
       now.month,
       now.day,
-      11, // 11 AM
-      0,  // 0 minutes
     );
 
-    // If it's past 11 AM, schedule for tomorrow
     if (now.isAfter(scheduledDate)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
@@ -256,7 +253,6 @@ class LocalNotificationService {
       payload: 'daily_reminder',
     );
 
-    // Show immediate confirmation
     await showNotification(
       id: 0,
       title: 'Pengingat Makan Siang Diatur',

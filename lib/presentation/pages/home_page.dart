@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     Future.microtask(() async {
-      // Muat data restoran dan favorit
       await context.read<RestaurantListProvider>().fetchRestaurants();
       await context.read<LocalDatabaseProvider>().loadAllRestaurants();
     });
@@ -105,21 +104,19 @@ class _HomePageState extends State<HomePage> {
 
                             return RestaurantCard(
                               restaurant: restaurant,
-                              showFavoriteIcon: true, // Tampilkan ikon favorit
+                              showFavoriteIcon: true,
                               showDeleteIcon: false,
-                              isFavorite: isFavorite, // Teruskan status favorit
+                              isFavorite: isFavorite,
                               onTap: () {
                                 Navigator.pushNamed(
                                   context,
                                   NavigationRoute.detailRoute.name,
                                   arguments: restaurant.id,
                                 ).then((_) {
-                                  // Reload data when returning to Home page
                                   localDbProvider.loadAllRestaurants();
                                 });
                               },
                               onDelete: () {
-                                // Handle aksi hapus dari favorit
                                 if (restaurant.id != null) {
                                   localDbProvider
                                       .removeRestaurant(restaurant.id!);

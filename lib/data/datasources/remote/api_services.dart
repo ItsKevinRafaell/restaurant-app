@@ -10,8 +10,6 @@ class ApiServices {
   static const String baseUrl = 'https://restaurant-api.dicoding.dev';
   static var client = http.Client();
 
-  // ApiServices({required this.client});
-
   Future<RestaurantListModel> getRestaurants() async {
     final response = await client.get(Uri.parse('$baseUrl/list'));
 

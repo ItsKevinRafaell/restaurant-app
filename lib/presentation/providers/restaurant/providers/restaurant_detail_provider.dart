@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_app/data/datasources/local/local_database_service.dart';
 import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
 import 'package:restaurant_app/domain/repositories/restaurant_repository.dart';
-
-enum RestaurantDetailState { initial, loading, loaded, error }
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_detail_state.dart';
 
 class RestaurantDetailProvider extends ChangeNotifier {
   final RestaurantRepository _repository;
@@ -12,8 +11,8 @@ class RestaurantDetailProvider extends ChangeNotifier {
     required RestaurantRepository repository,
   }) : _repository = repository;
 
-  RestaurantDetailState _state = RestaurantDetailState.initial;
-  RestaurantDetailState get state => _state;
+  RestaurantDetailResultState _state = RestaurantDetailNoneState();
+  RestaurantDetailResultState get state => _state;
 
   DetailRestaurant? _restaurant;
   DetailRestaurant? get restaurant => _restaurant;
@@ -62,7 +61,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
     if (_disposed) return;
 
     try {
-      _setState(RestaurantDetailState.loading);
+      _setState(RestaurantDetailLoadingState);
 
       final result = await _repository.getRestaurantDetail(id);
       if (result.restaurant == null) {
@@ -71,17 +70,17 @@ class RestaurantDetailProvider extends ChangeNotifier {
 
       if (!_disposed) {
         _restaurant = result.restaurant;
-        _setState(RestaurantDetailState.loaded);
+        _setState(RestaurantDetailLoadedState);
       }
     } catch (e) {
       if (!_disposed) {
         _message = e.toString();
-        _setState(RestaurantDetailState.error);
+        _setState(RestaurantDetailErrorState);
       }
     }
   }
 
-  void _setState(RestaurantDetailState newState) {
+  void _setState(newState) {
     if (!_disposed) {
       _state = newState;
       _safeNotifyListeners();
@@ -105,7 +104,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
         await _repository.removeFromFavorites(restaurantId);
       }
     } catch (e) {
-      _isFavorite = !_isFavorite; // Revert on error
+      _isFavorite = !_isFavorite;
     }
   }
 

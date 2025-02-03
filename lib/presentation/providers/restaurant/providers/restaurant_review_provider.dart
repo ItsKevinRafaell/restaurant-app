@@ -21,7 +21,6 @@ class RestaurantReviewProvider extends ChangeNotifier {
       notifyListeners();
 
       final result = await apiService.postReview(id, name, review);
-      // _reviews = result;
       _isLoading = false;
       notifyListeners();
       return true;

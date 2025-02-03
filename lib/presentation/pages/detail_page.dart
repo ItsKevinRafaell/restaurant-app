@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/favorite_provider.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_detail_state.dart';
 import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
 import 'package:restaurant_app/presentation/widgets/menu_item_card.dart';
 
@@ -36,11 +37,11 @@ class _DetailPageState extends State<DetailPage> {
       ),
       body: Consumer2<RestaurantDetailProvider, FavoriteProvider>(
         builder: (context, detailProvider, favoriteProvider, child) {
-          if (detailProvider.state == RestaurantDetailState.loading) {
+          if (detailProvider.state == RestaurantDetailLoadingState) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (detailProvider.state == RestaurantDetailState.error) {
+          if (detailProvider.state == RestaurantDetailErrorState) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

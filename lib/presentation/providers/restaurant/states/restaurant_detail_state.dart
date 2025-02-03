@@ -4,6 +4,8 @@ abstract class RestaurantDetailResultState {
   const RestaurantDetailResultState();
 }
 
+class RestaurantDetailNoneState extends RestaurantDetailResultState {}
+
 class RestaurantDetailLoadingState extends RestaurantDetailResultState {}
 
 class RestaurantDetailErrorState extends RestaurantDetailResultState {

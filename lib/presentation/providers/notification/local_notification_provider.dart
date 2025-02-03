@@ -14,15 +14,12 @@ class LocalNotificationProvider extends ChangeNotifier {
   bool get permission => _permissionGranted;
 
   DateTime getNextNotificationTime() {
-    // Get tomorrow at 11:00 AM
     final now = DateTime.now();
     final tomorrow = DateTime(now.year, now.month, now.day + 1, 11, 0);
-    
-    // If it's before 11 AM, schedule for today at 11 AM
     if (now.hour < 11) {
       return DateTime(now.year, now.month, now.day, 11, 0);
     }
-    
+
     return tomorrow;
   }
 

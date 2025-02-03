@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
 import 'package:restaurant_app/domain/repositories/restaurant_repository.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_detail_provider.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_detail_state.dart';
 
 class MockRestaurantRepository extends Mock implements RestaurantRepository {}
 
@@ -38,7 +39,7 @@ void main() {
 
   group('restaurant detail provider', () {
     test('should return initial state when provider is initialized', () {
-      expect(provider.state, equals(RestaurantDetailState.initial));
+      expect(provider.state, equals(RestaurantDetailNoneState));
       expect(provider.restaurant, isNull);
       expect(provider.message, isNull);
     });
@@ -55,7 +56,7 @@ void main() {
 
       // assert
       verify(() => mockRepository.getRestaurantDetail(restaurantId)).called(1);
-      expect(provider.state, equals(RestaurantDetailState.loaded));
+      expect(provider.state, equals(RestaurantDetailLoadedState));
       expect(provider.restaurant, equals(mockRestaurant.restaurant));
     });
 
@@ -69,7 +70,7 @@ void main() {
       await provider.fetchRestaurantDetail(restaurantId);
 
       // assert
-      expect(provider.state, equals(RestaurantDetailState.error));
+      expect(provider.state, equals(RestaurantDetailErrorState));
       expect(provider.message, contains(errorMessage));
     });
 

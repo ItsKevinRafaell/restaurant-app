@@ -31,23 +31,23 @@ class FavoriteProvider extends ChangeNotifier {
 
     try {
       final newState = !_isFavorite;
-      
+
       if (newState) {
         final result = await _localDatabaseService.insertRestaurant(restaurant);
-        if (result <= 0) return; // Insert failed
+        if (result <= 0) return;
       } else {
-        final result = await _localDatabaseService.removeRestaurant(restaurant.id!);
-        if (result <= 0) return; // Remove failed
+        final result =
+            await _localDatabaseService.removeRestaurant(restaurant.id!);
+        if (result <= 0) return;
       }
 
       _isFavorite = newState;
       notifyListeners();
 
-      // Update the LocalDatabaseProvider
       await _localDatabaseProvider?.loadAllRestaurants();
     } catch (e) {
       debugPrint('Error toggling favorite: $e');
-      // Revert to actual database state
+
       await checkFavoriteStatus(restaurant.id!);
     }
   }

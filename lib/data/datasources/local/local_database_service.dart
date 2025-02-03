@@ -6,7 +6,6 @@ class LocalDatabaseService {
   static const String _tableName = 'favorites';
   static const int _version = 1;
 
-  // Singleton instance
   static final LocalDatabaseService _instance =
       LocalDatabaseService._internal();
   factory LocalDatabaseService() => _instance;
@@ -14,7 +13,6 @@ class LocalDatabaseService {
 
   Database? _database;
 
-  // Initialize database (only once)
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initializeDb();
@@ -45,7 +43,6 @@ class LocalDatabaseService {
     );
   }
 
-  // Insert restaurant into the database
   Future<int> insertRestaurant(DetailRestaurant restaurant) async {
     try {
       if (restaurant.id == null) {
@@ -53,11 +50,10 @@ class LocalDatabaseService {
       }
 
       final db = await database;
-      
-      // Check if restaurant already exists
+
       final exists = await isFavorite(restaurant.id!);
       if (exists) {
-        return 0; // Already exists
+        return 0;
       }
 
       final data = {
@@ -69,7 +65,7 @@ class LocalDatabaseService {
         "city": restaurant.city ?? '',
         "rating": restaurant.rating ?? 0.0,
       };
-      
+
       return await db.insert(
         _tableName,
         data,
@@ -80,13 +76,12 @@ class LocalDatabaseService {
     }
   }
 
-  // Remove restaurant from the database
   Future<int> removeRestaurant(String idRestaurant) async {
     try {
       final db = await database;
       return await db.delete(
         _tableName,
-        where: "id_restaurant = ?", // Hapus berdasarkan id_restaurant
+        where: "id_restaurant = ?",
         whereArgs: [idRestaurant],
       );
     } catch (e) {
@@ -94,13 +89,12 @@ class LocalDatabaseService {
     }
   }
 
-  // Check if a restaurant is already in favorites
   Future<bool> isFavorite(String idRestaurant) async {
     try {
       final db = await database;
       final results = await db.query(
         _tableName,
-        where: "id_restaurant = ?", // Cek berdasarkan id_restaurant
+        where: "id_restaurant = ?",
         whereArgs: [idRestaurant],
       );
       return results.isNotEmpty;
@@ -109,7 +103,6 @@ class LocalDatabaseService {
     }
   }
 
-  // Get all restaurants in favorites
   Future<List<DetailRestaurant>> getAllRestaurants() async {
     try {
       final db = await database;
@@ -117,8 +110,7 @@ class LocalDatabaseService {
 
       return results.map((result) {
         return DetailRestaurant.fromMapSqlite({
-          'id_restaurant':
-              result['id_restaurant'] as String?, // Pastikan tipe data sesuai
+          'id_restaurant': result['id_restaurant'] as String?,
           'name': result['name'] as String?,
           'description': result['description'] as String?,
           'address': result['address'] as String?,

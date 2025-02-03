@@ -51,7 +51,6 @@ class _FavoritePageState extends State<FavoritePage> {
                             NavigationRoute.detailRoute.name,
                             arguments: restaurant.id,
                           ).then((_) {
-                            // Reload data when returning to Favorite page
                             provider.loadAllRestaurants();
                           });
                         },
