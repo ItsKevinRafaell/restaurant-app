@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
 import 'package:restaurant_app/domain/entities/restaurant_list_model.dart';
@@ -11,7 +10,9 @@ class ApiServices {
   static var client = http.Client();
 
   Future<RestaurantListModel> getRestaurants() async {
-    final response = await client.get(Uri.parse('$baseUrl/list'));
+    final response = await client.get(
+      Uri.parse('$baseUrl/list'),
+    );
 
     if (response.statusCode == 200) {
       return RestaurantListModel.fromJson(response.body);
@@ -21,7 +22,9 @@ class ApiServices {
   }
 
   Future<RestaurantDetailModel> getRestaurantDetail(String id) async {
-    final response = await client.get(Uri.parse('$baseUrl/detail/$id'));
+    final response = await client.get(
+      Uri.parse('$baseUrl/detail/$id'),
+    );
 
     if (response.statusCode == 200) {
       return RestaurantDetailModel.fromJson(response.body);
@@ -33,7 +36,9 @@ class ApiServices {
   }
 
   Future<RestaurantSearchModel> searchRestaurants(String query) async {
-    final response = await client.get(Uri.parse('$baseUrl/search?q=$query'));
+    final response = await client.get(
+      Uri.parse('$baseUrl/search?q=$query'),
+    );
 
     if (response.statusCode == 200) {
       return RestaurantSearchModel.fromJson(response.body);

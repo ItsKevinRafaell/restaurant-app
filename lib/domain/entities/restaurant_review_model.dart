@@ -12,23 +12,33 @@ class RestaurantReviewModel {
   });
 
   factory RestaurantReviewModel.fromRawJson(String str) =>
-      RestaurantReviewModel.fromJson(json.decode(str));
+      RestaurantReviewModel.fromJson(
+        json.decode(str),
+      );
 
-  String toRawJson() => json.encode(toJson());
+  String toRawJson() => json.encode(
+        toJson(),
+      );
 
   factory RestaurantReviewModel.fromJson(Map<String, dynamic> json) =>
       RestaurantReviewModel(
         error: json["error"],
         message: json["message"],
         customerReviews: List<CustomerReview>.from(
-            json["customerReviews"].map((x) => CustomerReview.fromJson(x))),
+          json["customerReviews"].map(
+            (x) => CustomerReview.fromJson(x),
+          ),
+        ),
       );
 
   Map<String, dynamic> toJson() => {
         "error": error,
         "message": message,
-        "customerReviews":
-            List<dynamic>.from(customerReviews.map((x) => x.toJson())),
+        "customerReviews": List<dynamic>.from(
+          customerReviews.map(
+            (x) => x.toJson(),
+          ),
+        ),
       };
 }
 
@@ -43,10 +53,13 @@ class CustomerReview {
     required this.date,
   });
 
-  factory CustomerReview.fromRawJson(String str) =>
-      CustomerReview.fromJson(json.decode(str));
+  factory CustomerReview.fromRawJson(String str) => CustomerReview.fromJson(
+        json.decode(str),
+      );
 
-  String toRawJson() => json.encode(toJson());
+  String toRawJson() => json.encode(
+        toJson(),
+      );
 
   factory CustomerReview.fromJson(Map<String, dynamic> json) => CustomerReview(
         name: json["name"],

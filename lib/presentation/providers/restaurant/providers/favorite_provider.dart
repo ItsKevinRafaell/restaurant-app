@@ -26,7 +26,7 @@ class FavoriteProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> toggleFavorite(DetailRestaurant restaurant) async {
+  Future<void> toggleFavorite(RestaurantDetail restaurant) async {
     if (restaurant.id == null) return;
 
     try {

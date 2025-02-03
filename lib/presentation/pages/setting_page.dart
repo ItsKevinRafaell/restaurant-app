@@ -11,6 +11,10 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
+  TextStyle _headerStyle(BuildContext context) {
+    return const TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,10 +26,7 @@ class _SettingPageState extends State<SettingPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Pengaturan Tema',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            Text('Pengaturan Tema', style: _headerStyle(context),),
             const SizedBox(height: 8),
             Card(
               elevation: 2,
@@ -63,10 +64,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Pengaturan Notifikasi',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            Text('Pengaturan Notifikasi', style: _headerStyle(context),),
             const SizedBox(height: 8),
             Card(
               elevation: 2,

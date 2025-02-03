@@ -14,9 +14,13 @@ class RestaurantListModel {
   });
 
   factory RestaurantListModel.fromJson(String str) =>
-      RestaurantListModel.fromMap(json.decode(str));
+      RestaurantListModel.fromMap(
+        json.decode(str),
+      );
 
-  String toJson() => json.encode(toMap());
+  String toJson() => json.encode(
+        toMap(),
+      );
 
   factory RestaurantListModel.fromMap(Map<String, dynamic> json) =>
       RestaurantListModel(
@@ -25,8 +29,9 @@ class RestaurantListModel {
         count: json["count"],
         restaurants: json["restaurants"] == null
             ? []
-            : List<Restaurant>.from(
-                json["restaurants"]!.map((x) => Restaurant.fromMap(x))),
+            : List<Restaurant>.from(json["restaurants"]!.map(
+                (x) => Restaurant.fromMap(x),
+              ),),
       );
 
   Map<String, dynamic> toMap() => {
@@ -35,7 +40,9 @@ class RestaurantListModel {
         "count": count,
         "restaurants": restaurants == null
             ? []
-            : List<dynamic>.from(restaurants!.map((x) => x.toMap())),
+            : List<dynamic>.from(restaurants!.map(
+                (x) => x.toMap(),
+              ),),
       };
 }
 
@@ -56,10 +63,13 @@ class Restaurant {
     this.rating,
   });
 
-  factory Restaurant.fromJson(String str) =>
-      Restaurant.fromMap(json.decode(str));
+  factory Restaurant.fromJson(String str) => Restaurant.fromMap(
+        json.decode(str),
+      );
 
-  String toJson() => json.encode(toMap());
+  String toJson() => json.encode(
+        toMap(),
+      );
 
   factory Restaurant.fromMap(Map<String, dynamic> json) => Restaurant(
         id: json["id"],

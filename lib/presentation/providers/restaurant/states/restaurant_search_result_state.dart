@@ -8,8 +8,6 @@ class RestaurantSearchInitialState extends RestaurantSearchResultState {}
 
 class RestaurantSearchLoadingState extends RestaurantSearchResultState {}
 
-class RestaurantSearchEmptyState extends RestaurantSearchResultState {}
-
 class RestaurantSearchErrorState extends RestaurantSearchResultState {
   final String message;
 

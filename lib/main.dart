@@ -22,7 +22,6 @@ import 'package:restaurant_app/presentation/providers/restaurant/providers/resta
 import 'package:restaurant_app/presentation/providers/restaurant/providers/favorite_provider.dart';
 import 'package:restaurant_app/presentation/routes/navigation_route.dart';
 import 'package:restaurant_app/presentation/themes/providers/theme_provider.dart';
-import 'package:workmanager/workmanager.dart';
 import 'presentation/themes/app_theme.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -90,9 +89,14 @@ void main() async {
           create: (context) => IndexNavProvider(),
         ),
         ChangeNotifierProvider(
-            create: (context) => RestaurantListProvider(ApiServices())),
+          create: (context) => RestaurantListProvider(
+            ApiServices(),
+          ),
+        ),
         ChangeNotifierProvider(
-          create: (context) => LocalDatabaseProvider(LocalDatabaseService()),
+          create: (context) => LocalDatabaseProvider(
+            LocalDatabaseService(),
+          ),
         ),
         ChangeNotifierProxyProvider<LocalDatabaseProvider, FavoriteProvider>(
           create: (context) => FavoriteProvider(
@@ -113,7 +117,9 @@ void main() async {
           ),
         ),
         ChangeNotifierProvider(
-          create: (context) => RestaurantSearchProvider(ApiServices()),
+          create: (context) => RestaurantSearchProvider(
+            ApiServices(),
+          ),
         ),
         ChangeNotifierProvider(
           create: (context) => RestaurantReviewProvider(

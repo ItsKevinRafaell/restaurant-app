@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:restaurant_app/core/error/exceptions.dart';
+import 'package:restaurant_app/core/error/restaurant_exception.dart';
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
 import 'package:restaurant_app/domain/entities/restaurant_list_model.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_list_provider.dart';
@@ -35,8 +35,9 @@ void main() {
       expect(provider.resultState, isA<RestaurantListNoneState>());
     });
 
-    test('should return LoadedState with restaurants data when fetch is successful', () async {
-      // arrange
+    test(
+        'should return LoadedState with restaurants data when fetch is successful',
+        () async {
       when(() => mockApiServices.getRestaurants()).thenAnswer(
         (_) async => RestaurantListModel(
           error: false,
@@ -46,10 +47,8 @@ void main() {
         ),
       );
 
-      // act
       await provider.fetchRestaurants();
 
-      // assert
       verify(() => mockApiServices.getRestaurants()).called(1);
       expect(provider.resultState, isA<RestaurantListLoadedState>());
       expect(
@@ -58,17 +57,16 @@ void main() {
       );
     });
 
-    test('should return ErrorState with server error message when RestaurantException occurs', () async {
-      // arrange
+    test(
+        'should return ErrorState with server error message when RestaurantException occurs',
+        () async {
       const errorMessage = 'Server error';
       when(() => mockApiServices.getRestaurants()).thenThrow(
         RestaurantException(errorMessage),
       );
 
-      // act
       await provider.fetchRestaurants();
 
-      // assert
       expect(provider.resultState, isA<RestaurantListErrorState>());
       expect(
         (provider.resultState as RestaurantListErrorState).message,
@@ -76,16 +74,15 @@ void main() {
       );
     });
 
-    test('should return ErrorState with no internet message when SocketException occurs', () async {
-      // arrange
+    test(
+        'should return ErrorState with no internet message when SocketException occurs',
+        () async {
       when(() => mockApiServices.getRestaurants()).thenThrow(
         const SocketException('Network is unreachable'),
       );
 
-      // act
       await provider.fetchRestaurants();
 
-      // assert
       expect(provider.resultState, isA<RestaurantListErrorState>());
       expect(
         (provider.resultState as RestaurantListErrorState).message,
@@ -93,16 +90,15 @@ void main() {
       );
     });
 
-    test('should return ErrorState with timeout message when TimeoutException occurs', () async {
-      // arrange
+    test(
+        'should return ErrorState with timeout message when TimeoutException occurs',
+        () async {
       when(() => mockApiServices.getRestaurants()).thenThrow(
         TimeoutException('Request timeout'),
       );
 
-      // act
       await provider.fetchRestaurants();
 
-      // assert
       expect(provider.resultState, isA<RestaurantListErrorState>());
       expect(
         (provider.resultState as RestaurantListErrorState).message,
@@ -110,16 +106,15 @@ void main() {
       );
     });
 
-    test('should return ErrorState with general error message when unknown Exception occurs', () async {
-      // arrange
+    test(
+        'should return ErrorState with general error message when unknown Exception occurs',
+        () async {
       when(() => mockApiServices.getRestaurants()).thenThrow(
         Exception('Unknown error'),
       );
 
-      // act
       await provider.fetchRestaurants();
 
-      // assert
       expect(provider.resultState, isA<RestaurantListErrorState>());
       expect(
         (provider.resultState as RestaurantListErrorState).message,

@@ -3,7 +3,7 @@ import 'package:restaurant_app/data/datasources/local/local_database_service.dar
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
 import 'package:restaurant_app/data/repositories/restaurant_repository_impl.dart';
 import 'package:restaurant_app/domain/usecases/search_restaurants.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_search_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_search_result_state.dart';
 
 class RestaurantSearchProvider extends ChangeNotifier {
   final SearchRestaurants searchRestaurants;
@@ -33,13 +33,16 @@ class RestaurantSearchProvider extends ChangeNotifier {
 
       final result = await searchRestaurants.execute(query);
       if (result.restaurants?.isEmpty ?? true) {
-        _resultState = RestaurantSearchEmptyState();
+        _resultState =
+            RestaurantSearchErrorState(message: 'Tidak ada restoran');
       } else {
         _resultState = RestaurantSearchLoadedState(data: result.restaurants!);
       }
       notifyListeners();
     } catch (e) {
-      _resultState = RestaurantSearchErrorState(message: e.toString());
+      _resultState = RestaurantSearchErrorState(
+        message: e.toString(),
+      );
       notifyListeners();
     }
   }

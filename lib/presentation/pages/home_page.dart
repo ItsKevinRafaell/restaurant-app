@@ -41,10 +41,14 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Consumer2<RestaurantListProvider, LocalDatabaseProvider>(
         builder: (context, restaurantProvider, localDbProvider, child) {
-          return switch (restaurantProvider.resultState) {
-            RestaurantListLoadingState _ =>
-              const Center(child: CircularProgressIndicator()),
-            RestaurantListErrorState(message: var error) => Center(
+          switch (restaurantProvider.resultState) {
+            case RestaurantListLoadingState _:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+
+            case RestaurantListErrorState(message: var error):
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -71,9 +75,10 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-              ),
-            RestaurantListLoadedState(data: List<Restaurant> restaurants) =>
-              RefreshIndicator(
+              );
+
+            case RestaurantListLoadedState(data: List<Restaurant> restaurants):
+              return RefreshIndicator(
                 onRefresh: _refreshData,
                 child: SingleChildScrollView(
                   child: Padding(
@@ -108,6 +113,9 @@ class _HomePageState extends State<HomePage> {
                               showDeleteIcon: false,
                               isFavorite: isFavorite,
                               onTap: () {
+                                context
+                                    .read<RestaurantDetailProvider>()
+                                    .setRestaurantImage(restaurant.pictureId!);
                                 Navigator.pushNamed(
                                   context,
                                   NavigationRoute.detailRoute.name,
@@ -129,9 +137,11 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-              ),
-            _ => const SizedBox(),
-          };
+              );
+
+            default:
+              return const SizedBox();
+          }
         },
       ),
     );

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/core/error/exceptions.dart';
+import 'package:restaurant_app/core/error/restaurant_exception.dart';
 import 'package:restaurant_app/data/datasources/local/local_database_service.dart';
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
 import 'package:restaurant_app/data/repositories/restaurant_repository_impl.dart';
@@ -32,7 +32,7 @@ class RestaurantListProvider extends ChangeNotifier {
 
       final result = await getRestaurants.execute();
       if (result.restaurants?.isEmpty ?? true) {
-        _resultState = RestaurantListEmptyState();
+        _resultState = RestaurantListErrorState(message: 'Tidak ada restoran');
       } else {
         _resultState = RestaurantListLoadedState(data: result.restaurants!);
       }

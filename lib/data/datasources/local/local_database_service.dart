@@ -1,10 +1,19 @@
 import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter/foundation.dart';
 
 class LocalDatabaseService {
   static const String _databaseName = 'restaurant-app.db';
   static const String _tableName = 'favorites';
   static const int _version = 1;
+
+  static const String _columnId = 'id_restaurant';
+  static const String _columnName = 'name';
+  static const String _columnDescription = 'description';
+  static const String _columnAddress = 'address';
+  static const String _columnPictureId = 'pictureId';
+  static const String _columnCity = 'city';
+  static const String _columnRating = 'rating';
 
   static final LocalDatabaseService _instance =
       LocalDatabaseService._internal();
@@ -19,31 +28,58 @@ class LocalDatabaseService {
     return _database!;
   }
 
-  Future<void> _createTables(Database database) async {
-    await database.execute(
-      """CREATE TABLE $_tableName(
-      id_restaurant TEXT PRIMARY KEY,          
-      name TEXT NOT NULL,
-      description TEXT,
-      address TEXT,
-      pictureId TEXT,
-      city TEXT NOT NULL,
-      rating REAL
-    )""",
-    );
-  }
-
   Future<Database> _initializeDb() async {
     return openDatabase(
       _databaseName,
       version: _version,
-      onCreate: (Database database, int version) async {
-        await _createTables(database);
-      },
+      onCreate: _createTables,
     );
   }
 
-  Future<int> insertRestaurant(DetailRestaurant restaurant) async {
+  Future<void> _createTables(Database database, int version) async {
+    await database.execute(
+      """CREATE TABLE $_tableName(
+      $_columnId TEXT PRIMARY KEY,          
+      $_columnName TEXT NOT NULL,
+      $_columnDescription TEXT,
+      $_columnAddress TEXT,
+      $_columnPictureId TEXT,
+      $_columnCity TEXT NOT NULL,
+      $_columnRating REAL
+    )""",
+    );
+  }
+
+  Map<String, dynamic> _restaurantToMap(RestaurantDetail restaurant) {
+    return {
+      _columnId: restaurant.id,
+      _columnName: restaurant.name ?? '',
+      _columnDescription: restaurant.description ?? '',
+      _columnAddress: restaurant.address ?? '',
+      _columnPictureId: restaurant.pictureId ?? '',
+      _columnCity: restaurant.city ?? '',
+      _columnRating: restaurant.rating ?? 0.0,
+    };
+  }
+
+  RestaurantDetail _mapToRestaurant(Map<String, dynamic> map) {
+    return RestaurantDetail.fromMapSqlite({
+      'id_restaurant': map[_columnId] as String?,
+      'name': map[_columnName] as String?,
+      'description': map[_columnDescription] as String?,
+      'address': map[_columnAddress] as String?,
+      'pictureId': map[_columnPictureId] as String?,
+      'city': map[_columnCity] as String?,
+      'rating': map[_columnRating] as double?,
+    });
+  }
+
+  Future<void> _handleDatabaseError(String operation, dynamic error) async {
+    debugPrint('Failed to $operation: $error');
+    throw Exception('Failed to $operation: $error');
+  }
+
+  Future<int> insertRestaurant(RestaurantDetail restaurant) async {
     try {
       if (restaurant.id == null) {
         throw Exception('Restaurant ID cannot be null');
@@ -56,23 +92,14 @@ class LocalDatabaseService {
         return 0;
       }
 
-      final data = {
-        "id_restaurant": restaurant.id,
-        "name": restaurant.name ?? '',
-        "description": restaurant.description ?? '',
-        "address": restaurant.address ?? '',
-        "pictureId": restaurant.pictureId ?? '',
-        "city": restaurant.city ?? '',
-        "rating": restaurant.rating ?? 0.0,
-      };
-
       return await db.insert(
         _tableName,
-        data,
+        _restaurantToMap(restaurant),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      throw Exception('Failed to insert restaurant: $e');
+      await _handleDatabaseError('insert restaurant', e);
+      return 0;
     }
   }
 
@@ -81,11 +108,12 @@ class LocalDatabaseService {
       final db = await database;
       return await db.delete(
         _tableName,
-        where: "id_restaurant = ?",
+        where: "$_columnId = ?",
         whereArgs: [idRestaurant],
       );
     } catch (e) {
-      throw Exception('Failed to remove restaurant: $e');
+      await _handleDatabaseError('remove restaurant', e);
+      return 0;
     }
   }
 
@@ -94,33 +122,29 @@ class LocalDatabaseService {
       final db = await database;
       final results = await db.query(
         _tableName,
-        where: "id_restaurant = ?",
+        where: "$_columnId = ?",
         whereArgs: [idRestaurant],
       );
       return results.isNotEmpty;
     } catch (e) {
-      throw Exception('Failed to check favorite status: $e');
+      await _handleDatabaseError('check favorite status', e);
+      return false;
     }
   }
 
-  Future<List<DetailRestaurant>> getAllRestaurants() async {
+  Future<List<RestaurantDetail>> getAllRestaurants() async {
     try {
       final db = await database;
       final results = await db.query(_tableName);
 
-      return results.map((result) {
-        return DetailRestaurant.fromMapSqlite({
-          'id_restaurant': result['id_restaurant'] as String?,
-          'name': result['name'] as String?,
-          'description': result['description'] as String?,
-          'address': result['address'] as String?,
-          'pictureId': result['pictureId'] as String?,
-          'city': result['city'] as String?,
-          'rating': result['rating'] as double?,
-        });
-      }).toList();
+      return results
+          .map(
+            (result) => _mapToRestaurant(result),
+          )
+          .toList();
     } catch (e) {
-      throw Exception('Failed to get all restaurants: $e');
+      await _handleDatabaseError('get all restaurants', e);
+      return [];
     }
   }
 }

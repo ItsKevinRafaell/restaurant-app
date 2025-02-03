@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/datasources/local/local_database_service.dart';
 import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/states/local_database_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/local_database_result_state.dart';
 
 class LocalDatabaseProvider extends ChangeNotifier {
   final LocalDatabaseService _service;
@@ -11,11 +11,11 @@ class LocalDatabaseProvider extends ChangeNotifier {
   String _message = "";
   String get message => _message;
 
-  List<DetailRestaurant>? _restaurantList;
-  List<DetailRestaurant>? get restaurantList => _restaurantList;
+  List<RestaurantDetail>? _restaurantList;
+  List<RestaurantDetail>? get restaurantList => _restaurantList;
 
-  DetailRestaurant? _restaurant;
-  DetailRestaurant? get restaurant => _restaurant;
+  RestaurantDetail? _restaurant;
+  RestaurantDetail? get restaurant => _restaurant;
 
   LocalDatabaseResultState _resultState = LocalDatabaseNoneState();
   LocalDatabaseResultState get resultState => _resultState;
@@ -25,17 +25,17 @@ class LocalDatabaseProvider extends ChangeNotifier {
       _resultState = LocalDatabaseLoadingState();
       notifyListeners();
 
-      final detailRestaurants = await _service.getAllRestaurants();
-      _restaurantList = detailRestaurants;
-      _resultState = LocalDatabaseLoadedState(detailRestaurants);
+      final restaurantDetails = await _service.getAllRestaurants();
+      _restaurantList = restaurantDetails;
+      _resultState = LocalDatabaseLoadedState(restaurantDetails);
       notifyListeners();
     } catch (e) {
-      _resultState = LocalDatabaseErrorState(message: e.toString());
+      _resultState = LocalDatabaseErrorState(message: e.toString(),);
       notifyListeners();
     }
   }
 
-  Future<void> addRestaurant(DetailRestaurant restaurant) async {
+  Future<void> addRestaurant(RestaurantDetail restaurant) async {
     try {
       await _service.insertRestaurant(restaurant);
       await loadAllRestaurants();

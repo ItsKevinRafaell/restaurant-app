@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/local_database_provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_detail_provider.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/states/local_database_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/local_database_result_state.dart';
 import 'package:restaurant_app/presentation/routes/navigation_route.dart';
 import 'package:restaurant_app/presentation/widgets/restaurant_card.dart';
 
@@ -26,16 +26,22 @@ class _FavoritePageState extends State<FavoritePage> {
       ),
       body: Consumer<LocalDatabaseProvider>(
         builder: (context, provider, child) {
-          return RefreshIndicator(
-            onRefresh: () => _refreshData(context),
-            child: switch (provider.resultState) {
-              LocalDatabaseLoadingState _ =>
-                const Center(child: CircularProgressIndicator()),
-              LocalDatabaseErrorState(message: var error) => Center(
-                  child: Text(error),
-                ),
-              LocalDatabaseLoadedState(data: var restaurants) => Padding(
-                  padding: const EdgeInsets.all(16.0),
+          switch (provider.resultState) {
+            case LocalDatabaseLoadingState _:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+
+            case LocalDatabaseErrorState(message: var error):
+              return Center(
+                child: Text(error),
+              );
+
+            case LocalDatabaseLoadedState(data: var restaurants):
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: RefreshIndicator(
+                  onRefresh: () => _refreshData(context),
                   child: ListView.builder(
                     itemCount: restaurants.length,
                     itemBuilder: (context, index) {
@@ -46,6 +52,9 @@ class _FavoritePageState extends State<FavoritePage> {
                         showFavoriteIcon: false,
                         showDeleteIcon: true,
                         onTap: () {
+                          context
+                              .read<RestaurantDetailProvider>()
+                              .setRestaurantImage(restaurant.pictureId!);
                           Navigator.pushNamed(
                             context,
                             NavigationRoute.detailRoute.name,
@@ -61,9 +70,13 @@ class _FavoritePageState extends State<FavoritePage> {
                     },
                   ),
                 ),
-              _ => const Center(child: Text("No data available")),
-            },
-          );
+              );
+
+            default:
+              return const Center(
+                child: Text("No data available"),
+              );
+          }
         },
       ),
     );

@@ -51,7 +51,7 @@ class RestaurantCard extends StatelessWidget {
                 child: Hero(
                   tag: restaurant.id ?? '',
                   child: Image.network(
-                    'https://restaurant-api.dicoding.dev/images/small/${restaurantPictureId}',
+                    'https://restaurant-api.dicoding.dev/images/small/$restaurantPictureId',
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,

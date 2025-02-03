@@ -30,21 +30,13 @@ void callbackDispatcher() {
       }
       debugPrint('WorkManager: Notification permission granted');
 
-      debugPrint('WorkManager: Attempting to show test notification');
-      await notificationService.showNotification(
-        id: 999,
-        title: 'Test Notification',
-        body:
-            'This is a test notification from WorkManager at ${DateTime.now()}',
-        payload: 'test',
-      );
-      debugPrint('WorkManager: Test notification sent successfully');
-
       debugPrint(
           'WorkManager: Setting up services for restaurant notification');
       final apiService = ApiServices();
-      final repository =
-          RestaurantRepositoryImpl(apiService, LocalDatabaseService());
+      final repository = RestaurantRepositoryImpl(
+        apiService,
+        LocalDatabaseService(),
+      );
       final getRestaurants = GetRestaurants(repository);
 
       debugPrint('WorkManager: Fetching restaurants from API');
@@ -65,9 +57,10 @@ void callbackDispatcher() {
           'WorkManager: Selected random restaurant - ${randomRestaurant.name}');
 
       debugPrint('WorkManager: Attempting to show restaurant notification');
-      await notificationService.showRestaurantNotification(
+      await notificationService.showNotification(
         id: 1,
-        title: 'Restaurant Recommendation: ${randomRestaurant.name}',
+        title:
+            'Rekomendasi Makan Siang dari Restoran Ternama: ${randomRestaurant.name}',
         body:
             '${randomRestaurant.description}\nRating: ${randomRestaurant.rating}⭐',
         payload: randomRestaurant.id!,
@@ -93,7 +86,7 @@ class WorkmanagerService {
   static Future<void> initializeWorkmanager() async {
     try {
       debugPrint('WorkManager: Starting initialization');
-      await Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+      await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
       await WorkmanagerService().runPeriodicTask();
       debugPrint('WorkManager: Initialized successfully');
     } catch (e, stackTrace) {
@@ -135,16 +128,6 @@ class WorkmanagerService {
           'WorkManager: Task scheduled successfully - will run daily at 11 AM');
     } catch (e, stackTrace) {
       debugPrint('WorkManager: Error scheduling task - $e');
-      debugPrint('StackTrace: $stackTrace');
-    }
-  }
-
-  Future<void> cancelAllTask() async {
-    try {
-      await _workmanager.cancelAll();
-      debugPrint('WorkManager: All tasks cancelled successfully');
-    } catch (e, stackTrace) {
-      debugPrint('WorkManager: Error cancelling tasks - $e');
       debugPrint('StackTrace: $stackTrace');
     }
   }

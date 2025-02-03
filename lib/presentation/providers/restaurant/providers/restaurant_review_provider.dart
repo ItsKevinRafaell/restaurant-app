@@ -20,7 +20,7 @@ class RestaurantReviewProvider extends ChangeNotifier {
       _isLoading = true;
       notifyListeners();
 
-      final result = await apiService.postReview(id, name, review);
+      await apiService.postReview(id, name, review);
       _isLoading = false;
       notifyListeners();
       return true;

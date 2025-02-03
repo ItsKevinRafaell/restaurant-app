@@ -14,9 +14,13 @@ class RestaurantSearchModel {
   });
 
   factory RestaurantSearchModel.fromJson(String str) =>
-      RestaurantSearchModel.fromMap(json.decode(str));
+      RestaurantSearchModel.fromMap(
+        json.decode(str),
+      );
 
-  String toJson() => json.encode(toMap());
+  String toJson() => json.encode(
+        toMap(),
+      );
 
   factory RestaurantSearchModel.fromMap(Map<String, dynamic> json) =>
       RestaurantSearchModel(
@@ -25,7 +29,10 @@ class RestaurantSearchModel {
         restaurants: json["restaurants"] == null
             ? []
             : List<Restaurant>.from(
-                json["restaurants"]!.map((x) => Restaurant.fromMap(x))),
+                json["restaurants"]!.map(
+                  (x) => Restaurant.fromMap(x),
+                ),
+              ),
       );
 
   Map<String, dynamic> toMap() => {
@@ -33,6 +40,10 @@ class RestaurantSearchModel {
         "founded": founded,
         "restaurants": restaurants == null
             ? []
-            : List<dynamic>.from(restaurants!.map((x) => x.toMap())),
+            : List<dynamic>.from(
+                restaurants!.map(
+                  (x) => x.toMap(),
+                ),
+              ),
       };
 }

@@ -1,8 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/data/datasources/local/local_database_service.dart';
+import 'package:restaurant_app/core/error/restaurant_exception.dart';
 import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
 import 'package:restaurant_app/domain/repositories/restaurant_repository.dart';
-import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_detail_state.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_detail_result_state.dart';
 
 class RestaurantDetailProvider extends ChangeNotifier {
   final RestaurantRepository _repository;
@@ -14,8 +17,8 @@ class RestaurantDetailProvider extends ChangeNotifier {
   RestaurantDetailResultState _state = RestaurantDetailNoneState();
   RestaurantDetailResultState get state => _state;
 
-  DetailRestaurant? _restaurant;
-  DetailRestaurant? get restaurant => _restaurant;
+  RestaurantDetail? _restaurant;
+  RestaurantDetail? get restaurant => _restaurant;
 
   String? _message;
   String? get message => _message;
@@ -41,56 +44,45 @@ class RestaurantDetailProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  void _safeNotifyListeners() {
-    if (!_disposed) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!_disposed) {
-          notifyListeners();
-        }
-      });
-    }
-  }
-
   void setRestaurantImage(String image) {
-    if (_disposed) return;
     _restaurantImage = image;
-    _safeNotifyListeners();
+    notifyListeners();
   }
 
   Future<void> fetchRestaurantDetail(String id) async {
-    if (_disposed) return;
+    _state = RestaurantDetailLoadingState();
+    notifyListeners();
 
     try {
-      _setState(RestaurantDetailLoadingState);
-
       final result = await _repository.getRestaurantDetail(id);
       if (result.restaurant == null) {
-        throw Exception('Restaurant data is null');
-      }
-
-      if (!_disposed) {
+        _message = 'Restaurant data is null';
+        _state = RestaurantDetailErrorState(message: _message!);
+      } else {
         _restaurant = result.restaurant;
-        _setState(RestaurantDetailLoadedState);
+        _state = RestaurantDetailLoadedState(data: _restaurant!);
       }
+    } on RestaurantException catch (e) {
+      _message = e.message;
+      _state = RestaurantDetailErrorState(message: _message!);
+    } on SocketException catch (_) {
+      _message = 'No internet connection. Please check your network.';
+      _state = RestaurantDetailErrorState(message: _message!);
+    } on TimeoutException catch (_) {
+      _message = 'Request timed out. Please try again.';
+      _state = RestaurantDetailErrorState(message: _message!);
     } catch (e) {
-      if (!_disposed) {
-        _message = e.toString();
-        _setState(RestaurantDetailErrorState);
-      }
-    }
-  }
-
-  void _setState(newState) {
-    if (!_disposed) {
-      _state = newState;
-      _safeNotifyListeners();
+      _message = 'An unexpected error occurred: ${e.toString()}';
+      _state = RestaurantDetailErrorState(message: _message!);
+    } finally {
+      notifyListeners();
     }
   }
 
   void toggleDescription() {
     if (_disposed) return;
     _isDescriptionExpanded = !_isDescriptionExpanded;
-    _safeNotifyListeners();
+    notifyListeners();
   }
 
   Future<void> toggleFavoriteStatus(String restaurantId) async {

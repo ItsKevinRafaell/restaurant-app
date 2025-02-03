@@ -15,7 +15,7 @@ class LocalDatabaseErrorState extends LocalDatabaseResultState {
 }
 
 class LocalDatabaseLoadedState extends LocalDatabaseResultState {
-  final List<DetailRestaurant> data;
+  final List<RestaurantDetail> data;
 
   LocalDatabaseLoadedState(this.data);
 }

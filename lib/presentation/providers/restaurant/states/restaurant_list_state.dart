@@ -8,8 +8,6 @@ class RestaurantListNoneState extends RestaurantListResultState {}
 
 class RestaurantListLoadingState extends RestaurantListResultState {}
 
-class RestaurantListEmptyState extends RestaurantListResultState {}
-
 class RestaurantListErrorState extends RestaurantListResultState {
   final String message;
 

@@ -23,40 +23,49 @@ class _ReviewPageState extends State<ReviewPage> {
     super.dispose();
   }
 
-  void _submitReview(BuildContext context) async {
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  bool _validateInputs() {
     final name = _nameController.text.trim();
     final review = _reviewController.text.trim();
 
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nama tidak boleh kosong')),
-      );
-      return;
+      _showSnackBar(context, 'Nama tidak boleh kosong');
+      return false;
     }
 
     if (review.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ulasan tidak boleh kosong')),
-      );
-      return;
+      _showSnackBar(context, 'Ulasan tidak boleh kosong');
+      return false;
     }
+
+    return true;
+  }
+
+  void _submitReview(BuildContext context) async {
+    if (!_validateInputs()) return;
 
     final provider = context.read<RestaurantReviewProvider>();
     try {
-      await provider.postReview(widget.restaurantId, name, review);
+      await provider.postReview(
+        widget.restaurantId,
+        _nameController.text.trim(),
+        _reviewController.text.trim(),
+      );
 
       _nameController.clear();
       _reviewController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ulasan berhasil dikirim!')),
-      );
-
+      _showSnackBar(context, 'Ulasan berhasil dikirim!');
       Navigator.pop(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengirim ulasan: $e')),
-      );
+      _showSnackBar(context, 'Gagal mengirim ulasan: $e');
     }
   }
 
@@ -95,26 +104,22 @@ class _ReviewPageState extends State<ReviewPage> {
             const SizedBox(height: 16),
             Consumer<RestaurantReviewProvider>(
               builder: (context, provider, child) {
-                if (provider.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-
-                return ElevatedButton(
-                  onPressed: () {
-                    _submitReview(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text(
-                    'Kirim Ulasan',
-                    style:
-                        AppTextStyles.titleMedium.copyWith(color: Colors.white),
-                  ),
-                );
+                return provider.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : ElevatedButton(
+                        onPressed: () => _submitReview(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(
+                          'Kirim Ulasan',
+                          style: AppTextStyles.titleMedium
+                              .copyWith(color: Colors.white),
+                        ),
+                      );
               },
             ),
           ],

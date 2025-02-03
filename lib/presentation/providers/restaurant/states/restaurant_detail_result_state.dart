@@ -15,7 +15,7 @@ class RestaurantDetailErrorState extends RestaurantDetailResultState {
 }
 
 class RestaurantDetailLoadedState extends RestaurantDetailResultState {
-  final DetailRestaurant data;
+  final RestaurantDetail data;
 
   RestaurantDetailLoadedState({required this.data});
 }

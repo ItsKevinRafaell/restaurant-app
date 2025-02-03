@@ -15,12 +15,9 @@ class LocalNotificationProvider extends ChangeNotifier {
 
   DateTime getNextNotificationTime() {
     final now = DateTime.now();
-    final tomorrow = DateTime(now.year, now.month, now.day + 1, 11, 0);
-    if (now.hour < 11) {
-      return DateTime(now.year, now.month, now.day, 11, 0);
-    }
-
-    return tomorrow;
+    return now.hour < 11
+        ? DateTime(now.year, now.month, now.day, 11, 0)
+        : DateTime(now.year, now.month, now.day + 1, 11, 0);
   }
 
   Future<void> _initializeNotifications() async {

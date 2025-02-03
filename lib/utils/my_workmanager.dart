@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:restaurant_app/data/datasources/local/local_database_service.dart';
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
 import 'package:restaurant_app/data/repositories/restaurant_repository_impl.dart';
@@ -21,7 +23,10 @@ class MyWorkManager {
           try {
             final result = await getRestaurants.execute();
             if (result.restaurants?.isNotEmpty ?? false) {
-              final restaurant = result.restaurants![0];
+              final random = Random().nextInt(
+                result.restaurants!.length,
+              );
+              final restaurant = result.restaurants![random];
               await notificationService.showNotification(
                 id: 1,
                 title: restaurant.name ?? '',
