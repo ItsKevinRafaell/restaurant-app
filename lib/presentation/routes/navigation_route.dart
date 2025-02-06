@@ -1,7 +1,6 @@
 enum NavigationRoute {
   mainRoute("/main"),
   searchRoute("/search"),
-  revieWRoute("/review"),
   favoriteRoute("/favorite"),
   settingRoute("/setting"),
   reviewRoute("/review"),

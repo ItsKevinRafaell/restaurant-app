@@ -4,6 +4,7 @@ import 'package:restaurant_app/domain/entities/restaurant_detail_model.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/restaurant_detail_provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/providers/favorite_provider.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_detail_result_state.dart';
+import 'package:restaurant_app/presentation/routes/navigation_route.dart';
 import 'package:restaurant_app/presentation/themes/typography/app_text_styles.dart';
 import 'package:restaurant_app/presentation/widgets/menu_item_card.dart';
 
@@ -136,7 +137,6 @@ class _DetailPageState extends State<DetailPage> {
                   ),
                   onPressed: () {
                     favoriteProvider.toggleFavorite(restaurant);
-                    debugPrint('click');
                   },
                 ),
               ],
@@ -285,7 +285,7 @@ class _DetailPageState extends State<DetailPage> {
                   onPressed: () {
                     Navigator.pushNamed(
                       context,
-                      '/review',
+                      NavigationRoute.reviewRoute.name,
                       arguments: widget.restaurantId,
                     ).then((_) {
                       context

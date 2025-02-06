@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/core/error/restaurant_exception.dart';
 import 'package:restaurant_app/data/datasources/local/local_database_service.dart';
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
 import 'package:restaurant_app/data/repositories/restaurant_repository_impl.dart';
@@ -16,6 +20,9 @@ class RestaurantSearchProvider extends ChangeNotifier {
             LocalDatabaseService(),
           ),
         );
+
+  String? _message;
+  String? get message => _message;
 
   @override
   void dispose() {
@@ -39,10 +46,19 @@ class RestaurantSearchProvider extends ChangeNotifier {
         _resultState = RestaurantSearchLoadedState(data: result.restaurants!);
       }
       notifyListeners();
+    } on RestaurantException catch (e) {
+      _message = e.message;
+      _resultState = RestaurantSearchErrorState(message: _message!);
+    } on SocketException catch (e) {
+      _message = e.message;
+      _resultState = RestaurantSearchErrorState(message: _message!);
+    } on TimeoutException catch (e) {
+      _message = e.message;
+      _resultState = RestaurantSearchErrorState(message: _message!);
     } catch (e) {
-      _resultState = RestaurantSearchErrorState(
-        message: e.toString(),
-      );
+      _message = 'An unexpected error occurred: ${e.toString()}';
+      _resultState = RestaurantSearchErrorState(message: _message!);
+    } finally {
       notifyListeners();
     }
   }

@@ -20,7 +20,6 @@ class FavoriteProvider extends ChangeNotifier {
       _isFavorite = await _localDatabaseService.isFavorite(id);
       notifyListeners();
     } catch (e) {
-      debugPrint('Error checking favorite status: $e');
       _isFavorite = false;
       notifyListeners();
     }
@@ -46,8 +45,6 @@ class FavoriteProvider extends ChangeNotifier {
 
       await _localDatabaseProvider?.loadAllRestaurants();
     } catch (e) {
-      debugPrint('Error toggling favorite: $e');
-
       await checkFavoriteStatus(restaurant.id!);
     }
   }

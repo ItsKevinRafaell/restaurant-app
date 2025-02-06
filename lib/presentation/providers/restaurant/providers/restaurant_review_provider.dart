@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/core/error/restaurant_exception.dart';
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
 import 'package:restaurant_app/domain/entities/restaurant_review_model.dart';
+import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_review_result_state.dart';
 
 class RestaurantReviewProvider extends ChangeNotifier {
   final ApiServices apiService;
@@ -9,26 +14,61 @@ class RestaurantReviewProvider extends ChangeNotifier {
 
   bool _isLoading = false;
   String _message = '';
-  final List<RestaurantReviewModel> _reviews = [];
+  RestaurantReviewState _state = const RestaurantReviewInitialState();
 
   bool get isLoading => _isLoading;
   String get message => _message;
-  List<RestaurantReviewModel> get reviews => _reviews;
+  RestaurantReviewState get state => _state;
 
   Future<bool> postReview(String id, String name, String review) async {
     try {
       _isLoading = true;
+      _state = const RestaurantReviewLoadingState();
       notifyListeners();
 
-      await apiService.postReview(id, name, review);
+      final response = await apiService.postReview(id, name, review);
       _isLoading = false;
-      notifyListeners();
-      return true;
-    } catch (e) {
+
+      if (response.error == false) {
+        _message = 'Review berhasil ditambahkan';
+        _state = RestaurantReviewSuccessState(
+          review: response,
+          message: _message,
+        );
+        notifyListeners();
+        return true;
+      } else {
+        _message = 'Gagal menambahkan review';
+        _state = RestaurantReviewErrorState(message: _message);
+        notifyListeners();
+        return false;
+      }
+    } on RestaurantException catch (e) {
       _isLoading = false;
-      _message = 'Error: $e';
+      _message = e.message;
+      _state = RestaurantReviewErrorState(message: _message);
       notifyListeners();
       return false;
+    } on SocketException catch (_) {
+      _isLoading = false;
+      _message = 'Tidak dapat terhubung ke server';
+      _state = RestaurantReviewErrorState(message: _message);
+      notifyListeners();
+      return false;
+    } on TimeoutException catch (_) {
+      _isLoading = false;
+      _message = 'Request timed out. Please try again.';
+      _state = RestaurantReviewErrorState(message: _message);
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _isLoading = false;
+      _message = 'Terjadi kesalahan: ${e.toString()}';
+      _state = RestaurantReviewErrorState(message: _message);
+      notifyListeners();
+      return false;
+    } finally {
+      notifyListeners();
     }
   }
 }

@@ -52,20 +52,26 @@ class _ReviewPageState extends State<ReviewPage> {
     if (!_validateInputs()) return;
 
     final provider = context.read<RestaurantReviewProvider>();
-    try {
-      await provider.postReview(
-        widget.restaurantId,
-        _nameController.text.trim(),
-        _reviewController.text.trim(),
-      );
 
+    final success = await provider.postReview(
+      widget.restaurantId,
+      _nameController.text.trim(),
+      _reviewController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    if (success) {
       _nameController.clear();
       _reviewController.clear();
-
-      _showSnackBar(context, 'Ulasan berhasil dikirim!');
-      Navigator.pop(context);
-    } catch (e) {
-      _showSnackBar(context, 'Gagal mengirim ulasan: $e');
+      if (mounted) {
+        _showSnackBar(context, provider.message);
+        Navigator.of(context).pop(); // Just pop the current route
+      }
+    } else {
+      if (mounted) {
+        _showSnackBar(context, provider.message);
+      }
     }
   }
 
