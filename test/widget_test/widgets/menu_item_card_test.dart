@@ -35,7 +35,9 @@ void main() {
 
       await tester.pumpWidget(longTextWidget);
 
-      final textWidget = tester.widget<Text>(find.byType(Text));
+      final textWidget = tester.widget<Text>(
+        find.byType(Text),
+      );
       expect(textWidget.maxLines, 2);
       expect(textWidget.overflow, TextOverflow.ellipsis);
     });
@@ -48,9 +50,7 @@ void main() {
           (widget) =>
               widget is Image &&
               widget.image is NetworkImage &&
-              (widget.image as NetworkImage)
-                  .url
-                  .contains('test-image.jpg'),
+              (widget.image as NetworkImage).url.contains('test-image.jpg'),
         ),
         findsOneWidget,
       );
@@ -59,9 +59,14 @@ void main() {
     testWidgets('should have correct card styling', (tester) async {
       await tester.pumpWidget(testWidget);
 
-      final card = tester.widget<Card>(find.byType(Card));
+      final card = tester.widget<Card>(
+        find.byType(Card),
+      );
       expect(card.elevation, 5);
-      expect(card.margin, const EdgeInsets.all(8));
+      expect(
+        card.margin,
+        const EdgeInsets.all(8),
+      );
       expect(
         card.shape,
         isA<RoundedRectangleBorder>().having(
@@ -75,7 +80,9 @@ void main() {
     testWidgets('should have correct image styling', (tester) async {
       await tester.pumpWidget(testWidget);
 
-      final image = tester.widget<Image>(find.byType(Image));
+      final image = tester.widget<Image>(
+        find.byType(Image),
+      );
       expect(image.fit, BoxFit.cover);
       expect(image.width, double.infinity);
       expect(image.height, 100);

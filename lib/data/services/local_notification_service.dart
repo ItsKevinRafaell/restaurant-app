@@ -31,7 +31,7 @@ class LocalNotificationService {
     );
 
     await flutterLocalNotificationsPlugin.initialize(
-      InitializationSettings(
+      const InitializationSettings(
         android: androidSettings,
         iOS: darwinSettings,
       ),

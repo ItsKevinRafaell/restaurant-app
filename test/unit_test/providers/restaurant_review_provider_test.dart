@@ -35,41 +35,56 @@ void main() {
     test('should return initial state when provider is initialized', () {
       expect(provider.isLoading, false);
       expect(provider.message, '');
-      expect(provider.state, isA<RestaurantReviewInitialState>());
+      expect(
+        provider.state,
+        isA<RestaurantReviewInitialState>(),
+      );
     });
 
     test('should post review successfully', () async {
-      when(() => mockApiServices.postReview(
-              restaurantId, reviewerName, reviewText))
-          .thenAnswer((_) async => mockReviewResponse);
+      when(
+        () =>
+            mockApiServices.postReview(restaurantId, reviewerName, reviewText),
+      ).thenAnswer((_) async => mockReviewResponse);
 
       final result =
           await provider.postReview(restaurantId, reviewerName, reviewText);
 
       expect(result, true);
       expect(provider.isLoading, false);
-      verify(() => mockApiServices.postReview(
-          restaurantId, reviewerName, reviewText)).called(1);
+      verify(
+        () =>
+            mockApiServices.postReview(restaurantId, reviewerName, reviewText),
+      ).called(1);
     });
 
     test('should return error when post review fails', () async {
-      when(() => mockApiServices.postReview(
-              restaurantId, reviewerName, reviewText))
-          .thenThrow(Exception('Failed to post review'));
+      when(
+        () =>
+            mockApiServices.postReview(restaurantId, reviewerName, reviewText),
+      ).thenThrow(
+        Exception('Failed to post review'),
+      );
 
       final result =
           await provider.postReview(restaurantId, reviewerName, reviewText);
 
       expect(result, false);
       expect(provider.isLoading, false);
-      verify(() => mockApiServices.postReview(
-          restaurantId, reviewerName, reviewText)).called(1);
+      verify(
+        () =>
+            mockApiServices.postReview(restaurantId, reviewerName, reviewText),
+      ).called(1);
     });
 
     test('should set loading state while posting review', () async {
-      when(() => mockApiServices.postReview(
-          restaurantId, reviewerName, reviewText)).thenAnswer((_) async {
-        await Future.delayed(const Duration(milliseconds: 100));
+      when(
+        () =>
+            mockApiServices.postReview(restaurantId, reviewerName, reviewText),
+      ).thenAnswer((_) async {
+        await Future.delayed(
+          const Duration(milliseconds: 100),
+        );
         return mockReviewResponse;
       });
 

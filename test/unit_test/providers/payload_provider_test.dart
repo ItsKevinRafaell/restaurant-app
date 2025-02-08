@@ -18,7 +18,10 @@ void main() {
 
       provider.updatePayload(newPayload);
 
-      expect(provider.payload, equals(newPayload));
+      expect(
+        provider.payload,
+        equals(newPayload),
+      );
     });
 
     test('should maintain new payload after multiple updates', () {
@@ -26,10 +29,16 @@ void main() {
       const secondPayload = 'second_payload';
 
       provider.updatePayload(firstPayload);
-      expect(provider.payload, equals(firstPayload));
+      expect(
+        provider.payload,
+        equals(firstPayload),
+      );
 
       provider.updatePayload(secondPayload);
-      expect(provider.payload, equals(secondPayload));
+      expect(
+        provider.payload,
+        equals(secondPayload),
+      );
     });
 
     test('should handle empty payload update', () {

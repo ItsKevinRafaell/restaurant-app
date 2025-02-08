@@ -32,13 +32,18 @@ void main() {
 
   group('restaurant list provider', () {
     test('should return NoneState when provider is initialized', () {
-      expect(provider.resultState, isA<RestaurantListNoneState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantListNoneState>(),
+      );
     });
 
     test(
         'should return LoadedState with restaurants data when fetch is successful',
         () async {
-      when(() => mockApiServices.getRestaurants()).thenAnswer(
+      when(
+        () => mockApiServices.getRestaurants(),
+      ).thenAnswer(
         (_) async => RestaurantListModel(
           error: false,
           message: "success",
@@ -49,8 +54,13 @@ void main() {
 
       await provider.fetchRestaurants();
 
-      verify(() => mockApiServices.getRestaurants()).called(1);
-      expect(provider.resultState, isA<RestaurantListLoadedState>());
+      verify(
+        () => mockApiServices.getRestaurants(),
+      ).called(1);
+      expect(
+        provider.resultState,
+        isA<RestaurantListLoadedState>(),
+      );
       expect(
         (provider.resultState as RestaurantListLoadedState).data,
         mockRestaurants,
@@ -61,13 +71,18 @@ void main() {
         'should return ErrorState with server error message when RestaurantException occurs',
         () async {
       const errorMessage = 'Server error';
-      when(() => mockApiServices.getRestaurants()).thenThrow(
+      when(
+        () => mockApiServices.getRestaurants(),
+      ).thenThrow(
         RestaurantException(errorMessage),
       );
 
       await provider.fetchRestaurants();
 
-      expect(provider.resultState, isA<RestaurantListErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantListErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantListErrorState).message,
         errorMessage,
@@ -77,13 +92,18 @@ void main() {
     test(
         'should return ErrorState with no internet message when SocketException occurs',
         () async {
-      when(() => mockApiServices.getRestaurants()).thenThrow(
+      when(
+        () => mockApiServices.getRestaurants(),
+      ).thenThrow(
         const SocketException('Network is unreachable'),
       );
 
       await provider.fetchRestaurants();
 
-      expect(provider.resultState, isA<RestaurantListErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantListErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantListErrorState).message,
         'Tidak ada koneksi internet. Silakan periksa jaringan Anda.',
@@ -93,13 +113,18 @@ void main() {
     test(
         'should return ErrorState with timeout message when TimeoutException occurs',
         () async {
-      when(() => mockApiServices.getRestaurants()).thenThrow(
+      when(
+        () => mockApiServices.getRestaurants(),
+      ).thenThrow(
         TimeoutException('Request timeout'),
       );
 
       await provider.fetchRestaurants();
 
-      expect(provider.resultState, isA<RestaurantListErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantListErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantListErrorState).message,
         'Permintaan waktu habis. Silakan coba lagi.',
@@ -109,13 +134,18 @@ void main() {
     test(
         'should return ErrorState with general error message when unknown Exception occurs',
         () async {
-      when(() => mockApiServices.getRestaurants()).thenThrow(
+      when(
+        () => mockApiServices.getRestaurants(),
+      ).thenThrow(
         Exception('Unknown error'),
       );
 
       await provider.fetchRestaurants();
 
-      expect(provider.resultState, isA<RestaurantListErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantListErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantListErrorState).message,
         'Terjadi kesalahan. Silakan coba lagi nanti.',

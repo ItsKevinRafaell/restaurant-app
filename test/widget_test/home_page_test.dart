@@ -22,8 +22,11 @@ void main() {
     restaurantListProvider = MockRestaurantListProvider();
     localDatabaseProvider = MockLocalDatabaseProvider();
 
-    when(() => restaurantListProvider.fetchRestaurants())
-        .thenAnswer((_) async => Future<void>.value());
+    when(
+      () => restaurantListProvider.fetchRestaurants(),
+    ).thenAnswer(
+      (_) async => Future<void>.value(),
+    );
 
     widget = MaterialApp(
       home: MultiProvider(
@@ -43,11 +46,15 @@ void main() {
   group('HomePage Widget Test', () {
     testWidgets('should display loading indicator when state is loading',
         (tester) async {
-      when(() => restaurantListProvider.resultState)
-          .thenReturn(RestaurantListLoadingState());
+      when(() => restaurantListProvider.resultState).thenReturn(
+        RestaurantListLoadingState(),
+      );
       when(() => localDatabaseProvider.restaurantList).thenReturn([]);
-      when(() => localDatabaseProvider.loadAllRestaurants())
-          .thenAnswer((_) async => Future<void>.value());
+      when(
+        () => localDatabaseProvider.loadAllRestaurants(),
+      ).thenAnswer(
+        (_) async => Future<void>.value(),
+      );
 
       await tester.pumpWidget(widget);
 
@@ -57,19 +64,27 @@ void main() {
     testWidgets('should display error message when state is error',
         (tester) async {
       const errorMessage = 'Failed to load data';
-      when(() => restaurantListProvider.resultState)
-          .thenReturn(RestaurantListErrorState(message: errorMessage));
+      when(() => restaurantListProvider.resultState).thenReturn(
+        RestaurantListErrorState(message: errorMessage),
+      );
       when(() => localDatabaseProvider.restaurantList).thenReturn([]);
-      when(() => localDatabaseProvider.loadAllRestaurants())
-          .thenAnswer((_) async => Future<void>.value());
+      when(
+        () => localDatabaseProvider.loadAllRestaurants(),
+      ).thenAnswer(
+        (_) async => Future<void>.value(),
+      );
 
       await tester.pumpWidget(widget);
 
       expect(find.text('Gagal memuat data: $errorMessage'), findsOneWidget);
       expect(find.text('Coba Lagi'), findsOneWidget);
 
-      await tester.tap(find.byType(ElevatedButton));
-      verify(() => restaurantListProvider.fetchRestaurants()).called(2);
+      await tester.tap(
+        find.byType(ElevatedButton),
+      );
+      verify(
+        () => restaurantListProvider.fetchRestaurants(),
+      ).called(2);
     });
 
     testWidgets('should display restaurant list when state is loaded',
@@ -93,11 +108,15 @@ void main() {
         ),
       ];
 
-      when(() => restaurantListProvider.resultState)
-          .thenReturn(RestaurantListLoadedState(data: mockRestaurants));
+      when(() => restaurantListProvider.resultState).thenReturn(
+        RestaurantListLoadedState(data: mockRestaurants),
+      );
       when(() => localDatabaseProvider.restaurantList).thenReturn([]);
-      when(() => localDatabaseProvider.loadAllRestaurants())
-          .thenAnswer((_) async => Future<void>.value());
+      when(
+        () => localDatabaseProvider.loadAllRestaurants(),
+      ).thenAnswer(
+        (_) async => Future<void>.value(),
+      );
 
       await tester.pumpWidget(widget);
 
@@ -110,11 +129,15 @@ void main() {
 
     testWidgets('should call refresh when pull to refresh is triggered',
         (tester) async {
-      when(() => restaurantListProvider.resultState)
-          .thenReturn(RestaurantListLoadedState(data: []));
+      when(() => restaurantListProvider.resultState).thenReturn(
+        RestaurantListLoadedState(data: []),
+      );
       when(() => localDatabaseProvider.restaurantList).thenReturn([]);
-      when(() => localDatabaseProvider.loadAllRestaurants())
-          .thenAnswer((_) async => Future<void>.value());
+      when(
+        () => localDatabaseProvider.loadAllRestaurants(),
+      ).thenAnswer(
+        (_) async => Future<void>.value(),
+      );
 
       await tester.pumpWidget(widget);
       await tester.fling(
@@ -124,16 +147,24 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      verify(() => restaurantListProvider.fetchRestaurants()).called(1);
-      verify(() => localDatabaseProvider.loadAllRestaurants()).called(1);
+      verify(
+        () => restaurantListProvider.fetchRestaurants(),
+      ).called(1);
+      verify(
+        () => localDatabaseProvider.loadAllRestaurants(),
+      ).called(1);
     });
 
     testWidgets('should have AppBar with correct title', (tester) async {
-      when(() => restaurantListProvider.resultState)
-          .thenReturn(RestaurantListLoadedState(data: []));
+      when(() => restaurantListProvider.resultState).thenReturn(
+        RestaurantListLoadedState(data: []),
+      );
       when(() => localDatabaseProvider.restaurantList).thenReturn([]);
-      when(() => localDatabaseProvider.loadAllRestaurants())
-          .thenAnswer((_) async => Future<void>.value());
+      when(
+        () => localDatabaseProvider.loadAllRestaurants(),
+      ).thenAnswer(
+        (_) async => Future<void>.value(),
+      );
 
       await tester.pumpWidget(widget);
 

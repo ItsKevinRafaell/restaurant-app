@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/core/error/restaurant_exception.dart';
 import 'package:restaurant_app/data/datasources/remote/api_services.dart';
-import 'package:restaurant_app/domain/entities/restaurant_review_model.dart';
 import 'package:restaurant_app/presentation/providers/restaurant/states/restaurant_review_result_state.dart';
 
 class RestaurantReviewProvider extends ChangeNotifier {

@@ -35,13 +35,18 @@ void main() {
 
   group('restaurant search provider', () {
     test('should return InitialState when provider is initialized', () {
-      expect(provider.resultState, isA<RestaurantSearchInitialState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantSearchInitialState>(),
+      );
     });
 
     test(
         'should return LoadedState with restaurants data when search is successful',
         () async {
-      when(() => mockApiServices.searchRestaurants(searchQuery)).thenAnswer(
+      when(
+        () => mockApiServices.searchRestaurants(searchQuery),
+      ).thenAnswer(
         (_) async => RestaurantSearchModel(
           error: false,
           founded: 1,
@@ -49,12 +54,15 @@ void main() {
         ),
       );
 
-      
       await provider.searchRestaurantsByQuery(searchQuery);
 
-      
-      verify(() => mockApiServices.searchRestaurants(searchQuery)).called(1);
-      expect(provider.resultState, isA<RestaurantSearchLoadedState>());
+      verify(
+        () => mockApiServices.searchRestaurants(searchQuery),
+      ).called(1);
+      expect(
+        provider.resultState,
+        isA<RestaurantSearchLoadedState>(),
+      );
       expect(
         (provider.resultState as RestaurantSearchLoadedState).data,
         mockRestaurants,
@@ -62,8 +70,9 @@ void main() {
     });
 
     test('should return EmptyState when no restaurants found', () async {
-      
-      when(() => mockApiServices.searchRestaurants(searchQuery)).thenAnswer(
+      when(
+        () => mockApiServices.searchRestaurants(searchQuery),
+      ).thenAnswer(
         (_) async => RestaurantSearchModel(
           error: false,
           founded: 0,
@@ -71,26 +80,30 @@ void main() {
         ),
       );
 
-      
       await provider.searchRestaurantsByQuery(searchQuery);
 
-      
-      expect(provider.resultState, isA<RestaurantSearchErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantSearchErrorState>(),
+      );
     });
 
     test(
         'should return ErrorState with server error message when RestaurantException occurs',
         () async {
-      
       const errorMessage = 'Server error';
-      when(() => mockApiServices.searchRestaurants(searchQuery))
-          .thenThrow(RestaurantException(errorMessage));
+      when(
+        () => mockApiServices.searchRestaurants(searchQuery),
+      ).thenThrow(
+        RestaurantException(errorMessage),
+      );
 
-      
       await provider.searchRestaurantsByQuery(searchQuery);
 
-      
-      expect(provider.resultState, isA<RestaurantSearchErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantSearchErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantSearchErrorState).message,
         errorMessage,
@@ -100,15 +113,18 @@ void main() {
     test(
         'should return ErrorState with no internet message when SocketException occurs',
         () async {
-      
-      when(() => mockApiServices.searchRestaurants(searchQuery))
-          .thenThrow(const SocketException('Network is unreachable'));
+      when(
+        () => mockApiServices.searchRestaurants(searchQuery),
+      ).thenThrow(
+        const SocketException('Network is unreachable'),
+      );
 
-      
       await provider.searchRestaurantsByQuery(searchQuery);
 
-      
-      expect(provider.resultState, isA<RestaurantSearchErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantSearchErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantSearchErrorState).message,
         contains('Network is unreachable'),
@@ -118,15 +134,18 @@ void main() {
     test(
         'should return ErrorState with timeout message when TimeoutException occurs',
         () async {
-      
-      when(() => mockApiServices.searchRestaurants(searchQuery))
-          .thenThrow(TimeoutException('Request timeout'));
+      when(
+        () => mockApiServices.searchRestaurants(searchQuery),
+      ).thenThrow(
+        TimeoutException('Request timeout'),
+      );
 
-      
       await provider.searchRestaurantsByQuery(searchQuery);
 
-      
-      expect(provider.resultState, isA<RestaurantSearchErrorState>());
+      expect(
+        provider.resultState,
+        isA<RestaurantSearchErrorState>(),
+      );
       expect(
         (provider.resultState as RestaurantSearchErrorState).message,
         contains('Request timeout'),

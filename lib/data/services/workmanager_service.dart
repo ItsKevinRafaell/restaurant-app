@@ -104,7 +104,11 @@ class WorkmanagerService {
       Duration initialDelay;
 
       if (now.isAfter(next11AM)) {
-        initialDelay = next11AM.add(const Duration(days: 1)).difference(now);
+        initialDelay = next11AM
+            .add(
+              const Duration(days: 1),
+            )
+            .difference(now);
       } else {
         initialDelay = next11AM.difference(now);
       }
